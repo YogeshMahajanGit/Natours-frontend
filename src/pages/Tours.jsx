@@ -5,7 +5,7 @@ import TourCard from '../components/tours/TourCard';
 import TourFilters from '../components/tours/TourFilters';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 import EmptyState from '../components/common/EmptyState';
-import { Navigation, MapPin, X, Compass, Loader2, Flame, Tag } from 'lucide-react';
+import { Navigation, MapPin, X, Compass, Loader2, Flame, Filter, ChevronDown, ChevronUp } from 'lucide-react';
 
 const Tours = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -19,12 +19,15 @@ const Tours = () => {
   const [nearMeUnit, setNearMeUnit] = useState('mi');
   const [nearMeLoading, setNearMeLoading] = useState(false);
   const [nearMeBanner, setNearMeBanner] = useState(null);
+  const [showMobileFilters, setShowMobileFilters] = useState(false);
 
   const difficulty = searchParams.get('difficulty') || '';
   const minPrice = searchParams.get('minPrice') || '';
   const maxPrice = searchParams.get('maxPrice') || '';
   const sort = searchParams.get('sort') || '';
   const top5 = searchParams.get('top5') === 'true';
+
+  const activeFilterCount = [difficulty, minPrice, maxPrice, sort, top5 ? 'top5' : ''].filter(Boolean).length;
 
   const fetchTours = useCallback(async () => {
     setLoading(true);
@@ -35,7 +38,7 @@ const Tours = () => {
         const top5Data = await toursApi.getTop5Cheap();
         setTours(top5Data);
         setTotalResults(top5Data.length);
-        setNearMeBanner('Showing Top 5 Best Value / Cheap Expeditions (route /tours/top-5-cheap)');
+        setNearMeBanner('Showing Top 5 Best Value / Cheap Expeditions');
       } else {
         const params = {};
         if (difficulty) params.difficulty = difficulty;
@@ -87,7 +90,7 @@ const Tours = () => {
         },
         async (geoError) => {
           console.warn('Geolocation failed or denied, using default coordinates (US West Coast):', geoError);
-          await executeNearMeSearch(34.0522, -118.2437, 'Defaulting to US West Coast (location access not granted)');
+          await executeNearMeSearch(34.0522, -118.2437, 'Defaulting to US West Coast');
         }
       );
     } else {
@@ -115,14 +118,14 @@ const Tours = () => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 space-y-8">
       {/* Header Banner */}
-      <div className="border-b-2 border-dashed border-[#D6CFBE] pb-6 flex flex-col md:flex-row md:items-end justify-between gap-4">
+      <div className="border-b-2 border-dashed border-[#D6CFBE] pb-6 flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div>
           <span className="text-xs font-mono text-[#A8541F] uppercase font-bold tracking-widest block mb-1">
             CATALOG & TRAILS
           </span>
-          <h1 className="font-serif text-3xl sm:text-5xl font-bold text-[#1F3D2B]">
+          <h1 className="font-serif text-3xl sm:text-5xl font-bold text-[#1F3D2B] tracking-tight">
             {top5 ? 'Top 5 Cheap Expeditions' : 'All Expeditions'}
           </h1>
         </div>
@@ -130,10 +133,10 @@ const Tours = () => {
         <div className="flex flex-wrap items-center gap-3">
           <button
             onClick={() => handleFilterChange('top5', top5 ? '' : 'true')}
-            className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg font-mono text-xs uppercase font-bold tracking-wider shadow transition-all ${
+            className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-mono text-xs uppercase font-bold tracking-wider shadow-sm transition-all duration-200 cursor-pointer ${
               top5
-                ? 'bg-[#A8541F] text-white ring-2 ring-[#A8541F]/30'
-                : 'bg-white border border-[#A8541F] text-[#A8541F] hover:bg-[#A8541F]/10'
+                ? 'bg-[#A8541F] text-white ring-2 ring-[#A8541F]/30 scale-[1.02]'
+                : 'bg-white border border-[#A8541F]/40 text-[#A8541F] hover:bg-[#A8541F]/10'
             }`}
           >
             <Flame className="w-4 h-4 fill-current" />
@@ -143,7 +146,7 @@ const Tours = () => {
           <button
             onClick={handleFindToursNearMe}
             disabled={nearMeLoading}
-            className="inline-flex items-center gap-2 bg-[#1F3D2B] hover:bg-[#2E5940] text-white px-4 py-2 rounded-lg font-mono text-xs uppercase font-bold tracking-wider shadow transition-all hover:scale-105 disabled:opacity-50"
+            className="inline-flex items-center gap-2 bg-[#1F3D2B] hover:bg-[#2E5940] text-white px-4 py-2.5 rounded-xl font-mono text-xs uppercase font-bold tracking-wider shadow-sm transition-all duration-200 hover:scale-[1.02] disabled:opacity-50 cursor-pointer"
           >
             {nearMeLoading ? (
               <>
@@ -158,22 +161,22 @@ const Tours = () => {
             )}
           </button>
 
-          <div className="font-mono text-xs text-[#8E8A7E] bg-white px-4 py-2 rounded-lg border border-[#D6CFBE]">
+          <div className="font-mono text-xs text-[#8E8A7E] bg-white/80 backdrop-blur-sm px-4 py-2.5 rounded-xl border border-[#D6CFBE] shadow-xs">
             Showing <span className="font-bold text-[#1F3D2B]">{totalResults}</span> active expeditions
           </div>
         </div>
       </div>
 
-      {/* Geolocation / Filter Active Banner */}
+      {/* Geolocation / Active Banner */}
       {nearMeBanner && (
-        <div className="bg-[#1F3D2B] text-white p-4 rounded-xl flex items-center justify-between gap-4 font-mono text-xs border border-[#A8541F] shadow-sm">
+        <div className="bg-[#1F3D2B] text-white p-4 rounded-xl flex items-center justify-between gap-4 font-mono text-xs border border-[#A8541F] shadow-sm animate-fade-in">
           <div className="flex items-center gap-2">
             <Compass className="w-5 h-5 text-amber-300 shrink-0" />
             <span>{nearMeBanner}</span>
           </div>
           <button
             onClick={handleReset}
-            className="p-1 hover:bg-[#2E5940] rounded text-amber-300 hover:text-white transition-colors"
+            className="p-1 hover:bg-[#2E5940] rounded text-amber-300 hover:text-white transition-colors cursor-pointer"
             title="Clear Filter"
           >
             <X className="w-4 h-4" />
@@ -181,18 +184,40 @@ const Tours = () => {
         </div>
       )}
 
-      {/* Main Grid: Filters + Tour List */}
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-        {/* Sidebar Filters */}
-        <div className="lg:col-span-1 space-y-4">
-          <div className="sticky top-24 space-y-4">
+      {/* Mobile Collapsible Filter Trigger (Shown only on small screens < lg) */}
+      <div className="lg:hidden">
+        <button
+          onClick={() => setShowMobileFilters(!showMobileFilters)}
+          className="w-full flex items-center justify-between p-4 bg-white border-2 border-dashed border-[#D6CFBE] rounded-xl shadow-xs text-[#1F3D2B] font-mono text-xs font-bold uppercase transition-all"
+        >
+          <div className="flex items-center gap-2">
+            <Filter className="w-4 h-4 text-[#A8541F]" />
+            <span>Filter & Refine Expeditions</span>
+            {activeFilterCount > 0 && (
+              <span className="bg-[#A8541F] text-white text-[10px] font-bold px-2 py-0.5 rounded-full ml-1">
+                {activeFilterCount} Active
+              </span>
+            )}
+          </div>
+          <div className="flex items-center gap-1 text-[#8E8A7E]">
+            <span className="text-[11px]">{showMobileFilters ? 'Hide' : 'Show'}</span>
+            {showMobileFilters ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+          </div>
+        </button>
+      </div>
+
+      {/* Main Grid: Filters Sidebar + Tour List */}
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 items-start">
+        {/* Sidebar Filters Container */}
+        <div className={`lg:col-span-1 space-y-5 ${showMobileFilters ? 'block' : 'hidden lg:block'}`}>
+          <div className="lg:sticky lg:top-24 space-y-5">
             {/* Near Me Radius Selector Box */}
-            <div className="bg-white border-2 border-dashed border-[#D6CFBE] rounded-xl p-4 shadow-sm space-y-3">
+            <div className="glass-card-accent rounded-2xl p-4 sm:p-5 shadow-sm space-y-3">
               <div className="flex items-center gap-2 text-[#A8541F]">
                 <MapPin className="w-4 h-4" />
-                <h4 className="font-mono text-xs uppercase font-bold">Proximity Search</h4>
+                <h4 className="font-mono text-xs uppercase font-bold tracking-wide">Proximity Search</h4>
               </div>
-              <div className="space-y-2">
+              <div className="space-y-2.5">
                 <div className="flex items-center justify-between text-xs font-mono text-[#8E8A7E]">
                   <span>Radius:</span>
                   <span className="font-bold text-[#1F3D2B]">{nearMeDistance} {nearMeUnit}</span>
@@ -204,11 +229,11 @@ const Tours = () => {
                   step="50"
                   value={nearMeDistance}
                   onChange={(e) => setNearMeDistance(Number(e.target.value))}
-                  className="w-full accent-[#A8541F]"
+                  className="w-full accent-[#A8541F] cursor-pointer"
                 />
                 <button
                   onClick={handleFindToursNearMe}
-                  className="w-full py-1.5 bg-[#1F3D2B] text-white font-mono text-xs uppercase rounded font-bold hover:bg-[#2E5940] transition-colors"
+                  className="w-full py-2 bg-[#1F3D2B] text-white font-mono text-xs uppercase rounded-xl font-bold hover:bg-[#2E5940] transition-colors cursor-pointer shadow-xs"
                 >
                   Search Radius
                 </button>
@@ -243,7 +268,7 @@ const Tours = () => {
               onAction={handleReset}
             />
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
               {tours.map((tour, idx) => (
                 <div key={tour._id || tour.id || idx} className="relative">
                   {top5 && (
@@ -263,3 +288,4 @@ const Tours = () => {
 };
 
 export default Tours;
+

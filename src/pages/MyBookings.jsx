@@ -41,7 +41,7 @@ const MyBookings = () => {
   }, [location.state]);
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 space-y-8">
       {justBookedSuccess && (
         <div className="p-4 bg-[#1F3D2B] text-white rounded-xl font-mono text-sm flex items-center justify-between shadow-lg">
           <span className="flex items-center gap-2">

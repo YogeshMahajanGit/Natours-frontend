@@ -69,8 +69,8 @@ const TourCard = ({ tour }) => {
     : 'Upcoming Season';
 
   return (
-    <div className="ticket-stub rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col group bg-white border-2 border-dashed border-[#D6CFBE]">
-      <div className="relative h-64 overflow-hidden bg-[#1F3D2B]">
+    <div className="ticket-stub rounded-2xl overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col group bg-white border-2 border-dashed border-[#D6CFBE]">
+      <div className="relative h-60 sm:h-64 overflow-hidden bg-[#1F3D2B]">
         <img
           src={imageUrl}
           alt={name}
@@ -89,9 +89,9 @@ const TourCard = ({ tour }) => {
         </div>
       </div>
 
-      <div className="p-6 flex-1 flex flex-col justify-between space-y-6">
+      <div className="p-5 sm:p-6 flex-1 flex flex-col justify-between space-y-6">
         <div>
-          <p className="text-xs font-mono text-[#A8541F] uppercase font-semibold tracking-wider mb-2">
+          <p className="text-xs font-mono text-[#A8541F] uppercase font-bold tracking-wider mb-2">
             {difficulty} • {duration}-Day Expedition
           </p>
           <p className="text-sm text-[#1B1B18]/80 line-clamp-2 leading-relaxed italic mb-6">
@@ -133,10 +133,10 @@ const TourCard = ({ tour }) => {
 
           <Link
             to={`/tours/${tourId}`}
-            className="inline-flex items-center gap-1.5 bg-[#1F3D2B] text-white px-4 py-2.5 rounded-lg text-xs font-mono uppercase tracking-wider hover:bg-[#2E5940] transition-colors shadow-sm group-hover:bg-[#A8541F]"
+            className="inline-flex items-center gap-1.5 bg-[#1F3D2B] text-white px-4 py-2.5 rounded-xl text-xs font-mono uppercase tracking-wider hover:bg-[#2E5940] transition-colors shadow-xs group-hover:bg-[#A8541F] font-bold"
           >
             <span>Details</span>
-            <ArrowRight className="w-3.5 h-3.5" />
+            <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
           </Link>
         </div>
       </div>
